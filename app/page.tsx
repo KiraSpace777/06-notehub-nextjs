@@ -1,25 +1,30 @@
 // ==========================================================
-//  6.5. Створення сторінок
+//  Домашня сторінка
 // ==========================================================
 //
-const Home = () => {
-  return (
-    <div>
-      <main>
-        <div>
-          <h1>Welcome Home</h1>
-          <p>This is the home page.</p>
-        </div>
-      </main>
-    </div>
-  );
-};
+
+import Home from "./home/page";
+
 export default Home;
 
-// =========================================
-// app/notes/page.tsx
+// ===================================================
+// import TanStackProvider from "@/components/TanStackProvider/TanStackProvider";
 
-// const Notes = () => {
-//   return <div>Notes</div>;
-// };
-// export default Notes;
+// import Header from "@/components/Header/Header";
+// import Footer from "@/components/Footer/Footer";
+
+// import "./globals.css";
+
+// export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+//   return (
+//     <html lang="en">
+//       <body>
+//         <TanStackProvider>
+//           <Header />
+//           <main>{children}</main>
+//           <Footer />
+//         </TanStackProvider>
+//       </body>
+//     </html>
+//   );
+// }

@@ -1,4 +1,120 @@
 // ==========================================================
+// NoteDetailsClient (клієнтський компонент)
+// - Динамічні маршрути
+// ==========================================================
+// Структура:
+// -------------------------
+// app/notes/[id]/page.tsx – залишаємо page.tsx серверним
+// app/notes/[id]/NoteDetails.client.tsx – створюємо окремий клієнтський компонент для інтерактивного вмісту
+// ----------------------------------------------------------
+// 1) створення компоненту для налаштування провайдера React Query, щоб усі клієнтські компоненти могли використовувати useQuery, кеш і мутації. У папці components створимо клієнтський компонент TanStackProvider(components/TanStackProvider/TanStackProvider.tsx)
+// -----------------------
+// 2) Провайдер підключається один раз на весь проєкт в головному шаблоні app/layout.tsx який огортає всі компоненти додатка.
+// -----------------------
+// 3) Prefetch і кешування: app/notes/[id]/page.tsx
+// -----------------------
+// 4) Вивід даних у клієнтському компоненті (useParams – хук). В useQuery потрібно передати той же queryKey, що і для prefetchQuery, щоб дістати із кешу дані відповідної нотатки. (refetchOnMount: false) - вимикає повторний запит при монтуванні, оскільки дані вже є з prefetchQuery.
+// ------------------------------------------------------------
+
+// ==========================================================
+//
+// app/notes/[id]/NoteDetails.client.tsx
+
+"use client";
+
+import { useParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { fetchNoteById } from "@/lib/api/fetchNoteById";
+import css from "./NoteDetails.module.css";
+
+export default function NoteDetailsClient() {
+  // Тестування помилки:
+  // throw new Error("Error message");
+
+  const params = useParams();
+  const id = params.id as string;
+
+  /* Отримання деталей нотатки з відключеним повторним запитом для збереження гідрації */
+  const {
+    data: note,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["note", id],
+    queryFn: () => fetchNoteById(id),
+    refetchOnMount: false,
+  });
+
+  /* Рендер стану очікування завантаження за специфікацією ТЗ */
+  if (isLoading) {
+    return <p>Loading, please wait...</p>;
+  }
+
+  /* Рендер стану помилки або відсутності даних за специфікацією ТЗ */
+  if (isError || !note) {
+    return <p>Something went wrong.</p>;
+  }
+
+  return (
+    <main className={css.main}>
+      <div className={css.container}>
+        <div className={css.item}>
+          {/* Створення суворої структури розмітки картки детальної інформації */}
+          <div className={css.header}>
+            <h2>{note.title}</h2>
+          </div>
+          <p className={css.tag}>{note.tag}</p>
+          <p className={css.content}>{note.content}</p>
+          <p className={css.date}>{new Date(note.createdAt).toLocaleDateString("uk-UA")}</p>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+// ======================================
+// "use client";
+
+// import { useQuery } from "@tanstack/react-query";
+// import { useParams } from "next/navigation";
+// import { getSingleNote } from "@/lib/api/";
+
+// // import css from "./NoteDetails.module.css";
+
+// const NoteDetailsClient = () => {
+//   const { id } = useParams<{ id: string }>();
+
+//   const {
+//     data: note,
+//     isLoading,
+//     error,
+//   } = useQuery({
+//     queryKey: ["note", id],
+//     queryFn: () => getSingleNote(id as string),
+//     enabled: Boolean(id),
+//     refetchOnMount: false,
+//   });
+
+//   if (isLoading) return <p>Loading...</p>;
+
+//   if (error || !note) return <p>Some error..</p>;
+
+//   const formattedDate = note.updatedAt
+//     ? `Updated at: ${note.updatedAt}`
+//     : `Created at: ${note.createdAt}`;
+
+//   return (
+//     <div>
+//       <h2>{note.title}</h2>
+//       <p>{note.content}</p>
+//       <p>{formattedDate}</p>
+//     </div>
+//   );
+// };
+
+// export default NoteDetailsClient;
+
+// ==========================================================
 // 6.14 Завантаження даних у клієнтському компоненті
 // ==========================================================
 // Проблема: обробка подій у серверному компоненті
@@ -47,43 +163,3 @@
 
 // У браузер потрапляє згенерований HTML, а React Query забезпечує інтерактивність без додаткових запитів.
 // ==========================================================
-//
-// app/notes/[id]/NoteDetails.client.tsx
-
-"use client";
-
-import { useQuery } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
-import { getSingleNote } from "@/lib/api";
-
-const NoteDetailsClient = () => {
-  const { id } = useParams<{ id: string }>();
-
-  const {
-    data: note,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["note", id],
-    queryFn: () => getSingleNote(id),
-    refetchOnMount: false,
-  });
-
-  if (isLoading) return <p>Loading...</p>;
-
-  if (error || !note) return <p>Some error..</p>;
-
-  const formattedDate = note.updatedAt
-    ? `Updated at: ${note.updatedAt}`
-    : `Created at: ${note.createdAt}`;
-
-  return (
-    <div>
-      <h2>{note.title}</h2>
-      <p>{note.content}</p>
-      <p>{formattedDate}</p>
-    </div>
-  );
-};
-
-export default NoteDetailsClient;

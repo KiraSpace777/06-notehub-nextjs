@@ -11,29 +11,9 @@ import css from "./error.module.css";
 
 type Props = {
   error: Error;
-  reset: () => void;
+  // reset: () => void;
 };
 
 export default function NotesError({ error }: Props) {
   return <p className={css.text}>Could not fetch the list of notes. {error.message}</p>;
 }
-
-// =====================================
-// "use client";
-
-// type Props = {
-//   error: Error;
-//   reset: () => void;
-// };
-
-// const Error = ({ error, reset }: Props) => {
-//   return (
-//     <div>
-//       <h2>Помилка при завантаженні</h2>
-//       <p>{error.message}</p>
-//       <button onClick={reset}>Спробувати знову</button>
-//     </div>
-//   );
-// };
-
-// export default Error;

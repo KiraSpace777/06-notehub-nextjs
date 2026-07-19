@@ -11,7 +11,7 @@ import css from "../error.module.css";
 
 type Props = {
   error: Error;
-  reset: () => void;
+  // reset: () => void;
 };
 
 export default function NotesError({ error }: Props) {
